@@ -157,6 +157,16 @@
   val incs = sql(“SELECT * FROM test”)
   ```
   
+  ###### Creating data frames from other data sources
+  
+  * sqlContext.load("xyz.parquet"); // default format is parquet // can be overridden by changing property spark.sql.sources.default
+  * sqlContext.load("/path/to/json/data","json")
+    * Depriciated methods
+    * sqlContext.jdbc  
+    * sqlContext.jsonFile
+    * sqlContext.jsonRDD // RDD containing JSON data
+    * sqlContext.parquetFile
+  
   ##### Spark Program
   * Create SparkContext -- This tell spark **how and where** to access cluster
     * SparkContext connects to cluster manager.
