@@ -355,7 +355,7 @@ and a 1,000 par66ons will be processed at a time.```
 * If the RDD is already materialize due to an earlier shuffle. This optimization is built into spark.
 
 ###### DAG to physical plan
-* DAG is the logical graph of RDD operations
+* DAG is the logical graph of RDD operations based on user code.
 * When an action is encountered, the DAG is translated into a physical plan to compute the RDD needed for performing the action.
 * The spark scheduler submits a job to compute all necessary RDDs.
 * Each job is made of one or more stages.
