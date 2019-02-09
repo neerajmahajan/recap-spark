@@ -115,8 +115,19 @@
   employeeDF.distinct // returns a new DF with unique rows
   employeeDF.select("firstName","lastName").show // select specific columns from data frame
   employeeDF.groupBy(col1,col2)  // group rows based on the specified column/s values
+  employeeDF.groupBy("age").avg().show
+  
   employeeDF.filter(employeeDF("age") > 25).show
+  OR
+  employeeDF.filter("age > 25").show
+  
   employeeDF.agg(expr,expr)  //Aggregate on entire dataframe without groups
   employeeDF.describe("age").show  // Compute statistics for numeric columns inluding count, mean, stddev, min, max
+
+  DataFrame department = sqlContext.read().parquet("...");
+  employeeDF.join(department,employeeDF.col("dept_id").equalTo(department("id"))    // Joining DataFrames
+  
+ employeeDF.agg(avg("age"))
+  
   ```
 
