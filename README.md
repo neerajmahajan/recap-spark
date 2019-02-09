@@ -38,10 +38,37 @@
 
 ###### Data Formats
 * Hadoop supported formats
-* text file
+* text file **WholeDirectory**
 * JSON
 * CVS
 * Parquet File
 * SequenceFiles
 * Avro
+
+###### RDD Operations
+* Transformations -> Return RDD -> Lazily evaluated
+  * map
+  * filter
+  * flatMap
+  * groupByKey  -> (k,v) ..  ->> (k,(v,v,v)) ....
+  * reduceByKey -> (k,v) ..  ->> (k,v)
+  * distinct
+* Action  -> Return value to driver program
+  * count
+  * reduce
+  * collect
+  * take
+  * first
+  * takeOrdered
+
+###### Reading data
+* sc.textFile ->list of lines
+* sc.wholeTextFile -> list of files
+* sc.sequenceFile[K,V]
+
+###### RDD Caching
+* We do caching of RDD when multiple actions are required on the same transformed RDD.
+* When there is branching in lineage
+* when cached and not enough memory then it goes to file.
+* rdd.cache() === rdd.persist(MEMORY_ONLY) --- cache is a transformation
 
