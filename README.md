@@ -8,6 +8,17 @@
   * Batch Processing
   * Streaming
   * Machine Learning
+  
+###### Spark vs MapReduce
+* Spark
+    * Spark tries to keep everything in memory.
+    * Chanining multiple jobs is faster.
+    * A combination of any number of map and reduce operations.
+* MapReduce
+    * Read and write from/to disk after every job.
+    * One Map and Reducer per job.
+    * Jobs are all bacth
+
 ###### Architecture
 
 * Driver Machine -> Driver Program -> creates SparkContext + how & where to access cluster.
@@ -53,8 +64,12 @@
   * map
   * filter
   * flatMap
-  * groupByKey  -> (k,v) ..  ->> (k,(v,v,v)) ....
-  * reduceByKey -> (k,v) ..  ->> (k,v)
+  * groupByKey  -> (k,v) ..  ->> (k,(v,v,v)) .... **CAREFULL: The single key-value pair cannot spans across multiple worker nodes and cause lot of unnecessary transfer of data ove the network**
+  * reduceByKey -> (k,v) ..  ->> (k,v) **Will not shuffle data like groupByKey** **IMP The reduced value should be of same type of input value**
+  * countByKey
+  * lookup(key)
+  * sortByKey(ascending=false)
+    * .top(3)(Ordering.by(_._2)) // another way of sorting
   * distinct
 * Action  -> Return value to driver program
   * count
@@ -86,13 +101,13 @@
   * import sqlContext.implicits._
   * Define schema using case class
   * read RDD
-     * Reflective
-     * Programtic
+     * Reflective --- mapping rdd to DF using case classes. can't create RDD using case class with more than 22 fields
+     * Programtic --- Use to construct DataFrames when column & thier types not known until runtime.
   * map rdd data to case class
   * call toDf()
   * call .registerTempTable("tableName") - Now SQL queries can be executed against this table.
   
-  
+  * Using Reflection
   ```
   val sqlContext = new org.apache.spark.sql.SQLContext(sc)
   import sqlContext.implicits._
@@ -129,6 +144,17 @@
   
   employeeDF.agg(avg("age") ,max("age"), mean("age"))   // Aggregates on the entire data frame without groups
   
+  ```
+  * Programmatically
+  ```
+  import sqlContext.implicits._
+  import org.apache.spark.sql._
+  import org.apache.spark.sql.types._
+  val rowRDD = sc.textFile("/user/user01/data/test.txt”).map(x=>x.split(" ")).map(p=>Row(p(0),p(2),p(4)))
+  val testsch = StructType(Array(StructField("IncNum",StringType,true),  StructField("Date",StringType,true),StructField("District",StringType,true)))
+  val testDF = sqlContext.createDataFrame(rowRDD,schema)
+  testDF.registerTempTable("test")
+  val incs = sql(“SELECT * FROM test”)
   ```
   
   ##### Spark Program
@@ -236,6 +262,25 @@ spark-submit --class <fully-qualified-path> \
 
 ```
 val textFile = spark.textFile("hdfs://....")
-val wordCount =  textFile.flatMap(line => line.split(",")).map(word => (word,1)).reduceByKey(_+_)
+val wordCount =  textFile.flatMap(line => line.split(","))
+                         .map(word => (word,1))
+                         .reduceByKey(_+_)
 wordCount.saveAsTextFile("hdfs://....")
 ```
+
+###### Partioninig
+
+* Range Partinioning  eg new RangePartitioner(5,pariRDD)
+* Hash Partinoning eg new HashPartitioner(100)
+* Customizing Partitioning is only avaialbel on Pair RDD.
+* Partitioning will send data of same keys to same worker.
+* **Always do persist or cache after partioninig if you are going to reuse it**
+* Some operation automatically  result in RDD with known partioner
+  * sortByKey - RangePartioner
+  * groupByKey - HashPartioner
+* We can also specify partitionType while doing transformation.
+* .partitioner tells the current Partitioner.
+* rdd.partition.size gives current number of partitioner.
+* repartition - Shuffle data across the network to create new set of partitions.
+* coalesce    - Decreases the number of partition
+* ***When we use multiple RDDs in our application and for operations that act on two pair RDDs, when we pre-partition there will be no shuffling across the network if both RDD have the same partitioner*
