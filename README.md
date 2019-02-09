@@ -127,7 +127,18 @@
   DataFrame department = sqlContext.read().parquet("...");
   employeeDF.join(department,employeeDF.col("dept_id").equalTo(department("id"))    // Joining DataFrames
   
-  employeeDF.agg(avg("age") ,max("age"), mean("age"))
+  employeeDF.agg(avg("age") ,max("age"), mean("age"))   // Aggregates on the entire data frame without groups
   
   ```
+  
+  ##### Spark Program
+  * Create SparkContext -- This tell spark **how and where** to access cluster
+    * SparkContext connects to cluster manager.
+    * Cluster Manager allocate resources across applications.
+    * Once connected, Spark acquires executors in worker nodes.
+    * Jar or python files passed to SC are sent to the executors.
+    * SC will send the tasks for the executors to run.
+    * Executors runs computations and store data for application.
+    
+  * 
 
