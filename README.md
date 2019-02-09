@@ -334,14 +334,31 @@ wordCount.saveAsTextFile("hdfs://....")
 val func1 = udf((arguments) => {function-definition})
 ```
 
-###### Performance
+##### Performance Tuning
 * Optimizing partioning improves performance. by defeault any shuffle operation creates 200 partitions, which can be repartition.
 * reduceByKey instead of groupBy
 ```
 If we have a large cluster with 100 nodes and 10 slots in each Executor, then we want the
-DataFrame to have 1,000 par66ons to use all of the Executor slots to process it
-simultaneously. In this case, it's also fine to have a DataFrame with thousands of pari66ons,
-and a 1,000 par66ons will be processed at a 6me.```
+DataFrame to have 1,000 partitions to use all of the Executor slots to process it
+simultaneously. In this case, it's also fine to have a DataFrame with thousands of partitions,
+and a 1,000 par66ons will be processed at a time.```
 ```
+###### Showing lineage for an RDD
+* employeeRdd.toDebugString
+* spark initially create RDD lineage(**logical plan**) for a set of tranformations/action required to do a job. It captures it into a DAG(Direct Acyclic graph). RDD uses pointers to trace it ancestors.
+* When spark see's an action, the **spark scheduler** creates a **physical plan** to compute the RDD needed for the computation.
+* When an RDD can be computed from it's parent without movement of data, multiple RDD are collapsed into a single stage. The collapsing of RDD into one stage is called **pipelining**.
+* Physical plan is composed of stages and when a shuffle happens then a new stage is created.
+###### Scenarios when scheduler truncate the lineage of RDD graph
+* **Pipelining** : when there is no movement of data from the parent RDD, the scheduler will pipeline the RDD graph collpsing multiple RDD into single stage.
+* **RDD Persistence** : when a RDD is persisted to cluster memeory or disk, the spark scheduler will truncate the lineage of RDD graph. it will begin computation based on persisted RDD.
+* If the RDD is already materialize due to an earlier shuffle. This optimization is built into spark.
 
+###### DAG to physical plan
+* DAG is the logical graph of RDD operations
+* When an action is encountered, the DAG is translated into a physical plan to compute the RDD needed for performing the action.
+* The spark scheduler submits a job to compute all necessary RDDs.
+* Each job is made of one or more stages.
+* Each stage is composed of tasks.
+* Stages are processed in order and individual tasks are scheduled and executed on the cluster.
 
