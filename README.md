@@ -230,3 +230,12 @@ spark-submit --class <fully-qualified-path> \
 
 ```spark-submit --class com.xyz.ProductDataApp --master local target/product-single-view.jar```
 * For Python application pass .py
+
+###### PairRDD - 2 field tuple
+* When working with distributed data, it is useful to oraganise data into key-value pairs as it allows us to **aggreagte** data or **regroup** data across the network.
+
+```
+val textFile = spark.textFile("hdfs://....")
+val wordCount =  textFile.flatMap(line => line.split(",")).map(word => (word,1)).reduceByKey(_+_)
+wordCount.saveAsTextFile("hdfs://....")
+```
