@@ -139,6 +139,94 @@
     * Jar or python files passed to SC are sent to the executors.
     * SC will send the tasks for the executors to run.
     * Executors runs computations and store data for application.
+  * When the program is submitted through spark-submit, driver runs in its own process and each executor in its own
+  * Thr driver together with its executors are referred to as a Spark Application. 
     
-  * 
+  ```
+  import org.apache.spark.SparkContext
+  import org.apache.spark.SparkContext._
+  import org.apache.spark.SparkConf
+  
+  object EmployeeApp{      // This file name should be EmployeeApp.scala
+    def main(args:Array[String]){
+        val conf = new SparkConf().setAppName("ProductDataMergerApp")
+        val sc = new SparkContext(conf)
+        val empRDD = sc.textFile("employee.csv").map(_.split(","))
+    }
+  }
+  ```
+###### Running Spark application
+* First, user submit an application using spark-submit.
+* spark-submit launches the Driver program, which invokes the main method. The main method creates SparkContext which tells the driver the location of the cluster manager.
+* The driver contacts the cluster manager for resources, and to launch executors.
+* Cluster manager will launch executors for the driver program.
+* Driver runs through the program instructions (RDD, transformation and Actions) sending work to executors in the form of tasks.
 
+###### Spark running mode
+* Local mode
+* Standalone deploy mode
+   * Place compiled version of Spark on each cluster node.
+   * Start master and workers by hand or use launch scripts provided by Apache Spark.
+   * To run on spark cluster pass **spark://IP:PORT** url of the master to SparkContext constructor.
+   * Running modes
+      * Client - 1) Driver launches in the client process that submitted the job. 2) Need to wait for result when job finishes(sync)
+      * Cluster -1) Driver program gets launched on one of the cluster node. 2) Can quit without waiting for job results (async)
+* Hadoop Yarn
+   * It is advantageous to run Spark on YARN if there is an existing Haddop cluster.
+   * Don't need to maintain separate cluster.
+   * We can take advantage of YARN scheduler for categorizing, isolating and prioritzing workloads.
+   * Cluster Mode
+      * Driver program is launched in Application Master
+      * Can quit without waiting for job results.
+      * Suitable for productions deployments.
+   * Client Mode
+      * Driver launched in the client process that submitted the job.
+      * Need to wait for results until job finishes.
+      * Useful for spark Interactive shell or debugging.
+* Mesos
+* spark-submit syntax
+```
+spark-submit \
+--class       <main-class>  \
+--master      <master-url>  \ 
+--deploy-mode <deploy-mode> \
+--conf        <key>=<value> \
+...   #other options
+<application-jar>  <path to bundled jar including all dependencies>
+[application-arguments]  <arguments passed to the main method>
+```
+###### Examples
+* To run in local mode
+```
+spark-submit --class <fully-qualified-path> \
+--master local[n] \      //n is the number of cores/executors
+/path/to/application-jar
+```
+* To run standalone **client** mode
+```
+spark-submit --class <fully-qualified-path> \
+--master spark:<master url> \      
+/path/to/application-jar
+```
+* To run on yarn **cluster**
+* In YARN mode the ResourceManager’s address is picked up from the Hadoop configuration and not given with --master
+
+```
+spark-submit --class <fully-qualified-path> \
+--master yarn-cluster \      
+/path/to/application-jar
+
+```
+
+* To run on yarn **client**
+* In YARN mode the ResourceManager’s address is picked up from the Hadoop configuration and not given with --master
+```
+spark-submit --class <fully-qualified-path> \
+--master yarn-client \      
+/path/to/application-jar
+
+```
+* Package you application in a jar file using maven or sbt and use it in spark submit
+
+```spark-submit --class com.xyz.ProductDataApp --master local target/product-single-view.jar```
+* For Python application pass .py
