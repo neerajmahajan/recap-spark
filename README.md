@@ -99,7 +99,24 @@
   case class Employee(firstName:String, lastName:String, age:Int)
   val empRDD = sc.textFile("employee.csv").map(_.split(","))
   val employees = empRDD.map(e => Employee(e(0),e(1),e(2).toInt))
-  val auctionDF = employees.toDF()
-  auctionDF.registerTempTable("auctionsDF")  
+  val employeeDF = employees.toDF()
+  employeeDF.registerTempTable("employeeDF")
+  employeeDF.printSchema() // print column names and thier type
+  employeeDF.columns  // return array of column names
+  employeeDF.count
+  employeeDF.show
+  employeeDF.collect // return Array[row], where each row contains values derived from Employee case class
+  employeeDF.first   // first row in the dataframe
+  employeeDF.head    // first row in the dataframe
+  employeeDF.take(10) // first 10 rows of the data frame
+  employeeDF.explain // print physical plan
+  employeeDF.toDF    // returns new data frame
+  employeeDF.cache   // Caches data frame in memory
+  employeeDF.distinct // returns a new DF with unique rows
+  employeeDF.select("firstName","lastName").show // select specific columns from data frame
+  employeeDF.groupBy(col1,col2)  // group rows based on the specified column/s values
+  employeeDF.filter(employeeDF("age") > 25).show
+  employeeDF.agg(expr,expr)  //Aggregate on entire dataframe without groups
+  employeeDF.describe("age").show  // Compute statistics for numeric columns inluding count, mean, stddev, min, max
   ```
 
