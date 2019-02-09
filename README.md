@@ -72,3 +72,18 @@
 * when cached and not enough memory then it goes to file.
 * rdd.cache() === rdd.persist(MEMORY_ONLY) --- cache is a transformation
 
+###### Data Frames RDD with names columns
+* Constructed from
+  * structure data format
+  * hive
+  * external database
+  * RDD
+* STEPS
+  * create SQLContext
+  * import sqlContext.implicits._
+  * Define schema using case class
+  * read RDD
+  * map rdd data to case class
+  * call toDf()
+  * call .registerTempTable("tableName") - Now SQL queries can be executed against this table.
+
