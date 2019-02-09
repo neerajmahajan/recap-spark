@@ -18,6 +18,9 @@
  * worker nodes can access  data  storage sources to ingest and output data as needed.
 * Worker Nodes.... -> Executor -> Tasks
 
+###### SPARK UI
+* http://localhost:4040/jobs/
+
 ###### Spark Core
 * Spark core is the computational engine responsible for
   * Task Scheduling
@@ -83,7 +86,20 @@
   * import sqlContext.implicits._
   * Define schema using case class
   * read RDD
+     * Reflective
+     * Programtic
   * map rdd data to case class
   * call toDf()
   * call .registerTempTable("tableName") - Now SQL queries can be executed against this table.
+  
+  
+  ```
+  val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+  import sqlContext.implicits._
+  case class Employee(firstName:String, lastName:String, age:Int)
+  val empRDD = sc.textFile("employee.csv").map(_.split(","))
+  val employees = empRDD.map(e => Employee(e(0),e(1),e(2).toInt))
+  val auctionDF = employees.toDF()
+  auctionDF.registerTempTable("auctionsDF")  
+  ```
 
