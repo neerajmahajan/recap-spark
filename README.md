@@ -327,3 +327,21 @@ wordCount.saveAsTextFile("hdfs://....")
 * repartition - Shuffle data across the network to create new set of partitions.
 * coalesce    - Decreases the number of partition
 * ***When we use multiple RDDs in our application and for operations that act on two pair RDDs, when we pre-partition there will be no shuffling across the network if both RDD have the same partitioner*
+
+###### UDF
+
+```
+val func1 = udf((arguments) => {function-definition})
+```
+
+###### Performance
+* Optimizing partioning improves performance. by defeault any shuffle operation creates 200 partitions, which can be repartition.
+* reduceByKey instead of groupBy
+```
+If we have a large cluster with 100 nodes and 10 slots in each Executor, then we want the
+DataFrame to have 1,000 par66ons to use all of the Executor slots to process it
+simultaneously. In this case, it's also fine to have a DataFrame with thousands of pari66ons,
+and a 1,000 par66ons will be processed at a 6me.```
+```
+
+
