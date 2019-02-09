@@ -143,6 +143,8 @@
   employeeDF.join(department,employeeDF.col("dept_id").equalTo(department("id"))    // Joining DataFrames
   
   employeeDF.agg(avg("age") ,max("age"), mean("age"))   // Aggregates on the entire data frame without groups
+  employeeDF.except(otherEmployeeDF)  // employeeDF - otherEmployeeDF
+  employeeDF.sort($"count".desc).show(5)
   
   ```
   * Programmatically
@@ -166,6 +168,37 @@
     * sqlContext.jsonFile
     * sqlContext.jsonRDD // RDD containing JSON data
     * sqlContext.parquetFile
+    
+  ###### Saving data frame
+  * save
+  ```
+  val usersDF = spark.read.load("examples/src/main/resources/users.parquet")
+  usersDF.select("name", "favorite_color").write.save("namesAndFavColors.parquet")
+  ```
+  ```
+  val peopleDF = spark.read.format("json").load("examples/src/main/resources/people.json")
+  peopleDF.select("name", "age").write.format("parquet").save("namesAndAges.parquet")
+  ```
+  ```
+  val peopleDFCsv = spark.read.format("csv")
+  .option("sep", ";")
+  .option("inferSchema", "true")
+  .option("header", "true")
+  .load("examples/src/main/resources/people.csv")
+  ```
+  * Running SQL on files directly
+  ```
+  val sqlDF = spark.sql("SELECT * FROM parquet.`examples/src/main/resources/users.parquet`")
+  ```
+  * Bucketing data while storing
+  ```
+  peopleDF.write.bucketBy(42, "name").sortBy("age").saveAsTable("people_bucketed")
+  ```
+  * PArtioning while saving
+  ```
+  usersDF.write.partitionBy("favorite_color").format("parquet").save("namesPartByColor.parquet")
+  ```
+  * insertIntoJDBC
   
   ##### Spark Program
   * Create SparkContext -- This tell spark **how and where** to access cluster
