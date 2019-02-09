@@ -127,7 +127,7 @@
   DataFrame department = sqlContext.read().parquet("...");
   employeeDF.join(department,employeeDF.col("dept_id").equalTo(department("id"))    // Joining DataFrames
   
- employeeDF.agg(avg("age"))
+  employeeDF.agg(avg("age") ,max("age"), mean("age"))
   
   ```
 
