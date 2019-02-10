@@ -362,3 +362,53 @@ and a 1,000 par66ons will be processed at a time.```
 * Each stage is composed of tasks.
 * Stages are processed in order and individual tasks are scheduled and executed on the cluster.
 
+###### Debugging
+* Sometime some tasks on executors are taking long than same tasks executing on other executors. This problem is called skew. It may be dues to uneven data into partition. so consider appply range/hash partitoning or repartion.
+* **Common issues leading to slow performance**
+    * The level of parallelism.
+    * The serialization format used during shuffle operations. Java built in serializer is default, use **Kyro** serialization--oftem more efficeint.
+    * Managing memeory to optimize your application.
+       * By default Spark use
+        * 60% for RDD storage
+        * 20% for shuffle
+        * 20% for user programs
+        * when we cache/ by default persist(MEMORY_ONLY). if there is not enough space to cache new RDD partitions then old ones are deleted and recomputed wheen needed. It is better to use persist(MEMORY_AND_DISK) 
+* **LOG FILES**
+  * the location of log files depend on the deployment mode
+     * In standalone : work/ directory of the Spark distribution on each worker
+     * In Mesos work/ directory of slave, but is accessible  from Mesos master.
+     * To access the logs in YARN, us the YARN log collection tool.
+###### Best Practices
+* Avoid shuffling large amounts of data.
+* Do not copy all elements of RDD to driver.
+* Filter sooner than later.
+* If you have many idle tasks, coalesce()
+* If not using all slots in cluster repartition
+
+#### SPARK DATA PIPELINES
+* using multiple components of spark in pipeline - streaming -> sql processing -> graph processing
+### Spark Streaming
+* Streaming data is continuos, but to process the data stream, it needs to be batched.
+* Spark streaming divides the data stream into batches of X milliseconds called discretized streams or DStreams.
+* A DSTREAM is a sequence of mini batches, where each mini-batch is represented as Spark RDD.
+* Each RDD in the stream will contain the records that are recieved by Spark during the batch interval.
+* Transformations are applied
+* Processed data is output in bacthes..
+
+```
+val ssc = new StreamingContext(sc,Seconds(5))
+or val ssc = new StreamingContext(sparkconf,Seconds(5))  // 5 is the batch interval
+val linesDstream = ssc.textFileStream("/mapr/stream")
+val sensorDstream = lineStream.map(parseIntoSensorObject)
+sensorDstream.forEachRDD { rdd => 
+
+}
+
+ssc.start()
+ssc.awaitTermination()
+
+```
+* Window operation on streaming
+  * batch interval
+  * window length // should be multiple of bacth interval
+  * sliding interval // should be multiple of bacth interval
