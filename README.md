@@ -412,3 +412,8 @@ ssc.awaitTermination()
   * batch interval
   * window length // should be multiple of bacth interval
   * sliding interval // should be multiple of bacth interval
+
+#### Executor allocation https://spoddutur.github.io/spark-notes/distribution_of_executors_cores_and_memory_for_spark_application.html
+* `--num-executors`
+* `--executor-cores`
+* `--executor-memory`
