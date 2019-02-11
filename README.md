@@ -417,3 +417,7 @@ ssc.awaitTermination()
 * `--num-executors`
 * `--executor-cores`
 * `--executor-memory`
+
+##### Broadcast & Accumulator
+* Broadcast is part of Spark that is responsible for broadcasting information across nodes in a cluster.
+* When you broadcast a value, it is copied to executors only once (while it is copied multiple times for tasks otherwise). It means that broadcast can help to get your Spark application faster if you have a large value to use in tasks or there are more tasks than executors.
