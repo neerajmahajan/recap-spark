@@ -421,3 +421,17 @@ ssc.awaitTermination()
 ##### Broadcast & Accumulator
 * Broadcast is part of Spark that is responsible for broadcasting information across nodes in a cluster.
 * When you broadcast a value, it is copied to executors only once (while it is copied multiple times for tasks otherwise). It means that broadcast can help to get your Spark application faster if you have a large value to use in tasks or there are more tasks than executors.
+
+###### Terminology
+* RDD - It is an immutable distributed collection of data that is partitioned across nodes and can be operated parallely.
+* Data Frame 
+   * Data is organised into named columns.
+   * Used to impose a structure onto a distributed collection of data.
+   * it provides a domain specific language API to manipulate your distributed data.
+   * It also allows to run sql queries on data frame.
+* Data Sets
+   * provide Higher degree of type-safety at compile time.
+   * ease of using the API.
+   * unified API for different languages
+   * Dataset API, you get compile-type safety. For example, if you use a filter operation using the wrong data type, Spark detects mismatch types and issues a compile error rather an execution runtime error, so that you catch errors earlier.
+   * Second, the Dataset API provides high-order methods, which makes code much easier to read and develop
